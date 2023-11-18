@@ -20,9 +20,9 @@ class Stack {
 public :
 	Stack () : sz(0) { 
 		int a;
-		//sem_init(&sem_prod,0,STACKSIZE);
-		sem_init(&sem_cons,0,0);
-		sem_init(&mutex,0,1);
+		sem_init(&sem_prod,1,STACKSIZE);
+		sem_init(&sem_cons,1,0);
+		sem_init(&mutex,1,1);
 		sem_getvalue(&sem_prod,&a);
 		cout<<"Value of semaphore producteur = "<<a<<endl;
 		memset(tab,0,sizeof tab) ;}
