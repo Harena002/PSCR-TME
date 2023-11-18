@@ -6,7 +6,7 @@
 #include <pthread.h>
 namespace pr {
 
-#define STACKSIZE 10
+#define STACKSIZE 3
 
 using namespace std;
 template<typename T>
@@ -20,14 +20,10 @@ class Stack {
 public :
 	Stack () : sz(0) { 
 		int a;
-		//sem_init(&sem_prod,0,STACKSIZE);
-		sem_init(&sem_cons,0,0);
-		sem_init(&mutex,0,1);
+		sem_init(&sem_prod,1,STACKSIZE);
+		sem_init(&sem_cons,1,0);
+		sem_init(&mutex,1,1);
 		sem_getvalue(&sem_prod,&a);
-		if (sem_init(&sem_prod,0,STACKSIZE) == -1){
-			perror("sem_init ");
-			
-		}
 		cout<<"Value of semaphore producteur = "<<a<<endl;
 		memset(tab,0,sizeof tab) ;}
 
@@ -51,7 +47,9 @@ public :
 	}
 	~Stack(){
 
-
+	    sem_close(&sem_prod);
+	    sem_close(&sem_cons);
+	    sem_close(&mutex);
 
 	}
 };
