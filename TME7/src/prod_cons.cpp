@@ -56,8 +56,6 @@ int main () {
 	Stack<char> * s = new (space) Stack<char>();
 
 	//Everyone has to munmap 
-	
-
 	for (int i = 0; i < NBPROD; i++){
             if (fork() == 0) {  
 		producteur(s);

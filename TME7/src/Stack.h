@@ -47,9 +47,9 @@ public :
 	}
 	~Stack(){
 
-	    sem_close(&sem_prod);
-	    sem_close(&sem_cons);
-	    sem_close(&mutex);
+	    sem_destroy(&sem_prod);
+	    sem_destroy(&sem_cons);
+	    sem_destroy(&mutex);
 
 	}
 };
