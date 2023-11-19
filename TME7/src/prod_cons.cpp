@@ -32,7 +32,7 @@ void producteur (Stack<char> * stack) {
 		//cout<<"before push"<<endl;
 		stack->push(c);
 		//cout<<"after push"<<endl;
-		cout<< "doit : "<<doIt<<endl;
+		//cout<< "doit : "<<doIt<<endl;
 	}
 }
 
