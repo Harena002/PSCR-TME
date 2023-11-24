@@ -15,6 +15,7 @@ void hand_SIGINT(int n){
 	//Why with valgrind, a Ctrl-C kills everyone whereas without valgrind I need no to do Ctrl-C twice
 	cout<<"pid : "<<getpid()<<" received the signal"<<endl;
 	doIt = false;
+	_exit(0);
 }
 
 void set_handler(){
@@ -29,6 +30,7 @@ void producteur (Stack<char> * stack) {
 	char c ;
 	while (doIt) {
 		cin.get(c);
+		if(!doIt) break;
 		//cout<<"before push"<<endl;
 		stack->push(c);
 		//cout<<"after push"<<endl;
@@ -39,8 +41,8 @@ void producteur (Stack<char> * stack) {
 void consomateur (Stack<char> * stack) {
 	while (doIt) {
 		char c = stack->pop();
-		cout << c <<endl <<flush ;
-		cout<<"doit : "<<doIt<<endl;
+		cout << c <<endl <<flush;
+		//cout<<"doit : "<<doIt<<endl;
 	}
 }
 
@@ -57,7 +59,7 @@ int main () {
 
 	//Everyone has to munmap 
 	for (int i = 0; i < NBPROD; i++){
-            if (fork() == 0) {  
+        if (fork() == 0) {  
 		producteur(s);
 		
 		if(munmap(space,sizeof(Stack<char>)) == -1){
