@@ -49,25 +49,19 @@ void list(int fd_sock_c, char *dir){   //exec portnumber directory
 
 
 void download(int fd_sock_c,char *dir,char *file){
-    cout <<"dir = "<<dir<<" file : "<<file<<endl;
+    //cout <<"dir = "<<dir<<" file : "<<file<<endl;
     DIR * di = opendir(dir);
     struct dirent *entry;
     int d = 0;
     while((entry = readdir(di))){
         if(strcmp(entry->d_name,".") == 0) continue;
         if(strcmp(entry->d_name,"..") == 0) continue;
-        cout << entry->d_name<<endl;
-        cout << "strlen : "<<entry->d_namlen<<endl;
-        cout <<"strlen of file : "<<strlen(file)<<endl;
-        if(strncmp(entry->d_name,file,entry->d_namlen) == 0){
-            d = 0;
-            break ;
-        }
-        
+        if(strncmp(entry->d_name,file,entry->d_namlen) != 0) continue;
         d++;
+        break ;
     } 
     
-    if(d>0){
+    if(d == 0){
         send(fd_sock_c,"1\n\n",1,0);                //the client will handle the error : the file doesn't exist
         cout<< "error : filename doesn't exist"<<endl;
         return;
@@ -85,13 +79,52 @@ void download(int fd_sock_c,char *dir,char *file){
 
     string line ;
     while(getline(f,line)){
-        cout <<"into the loop "<<endl;
         send(fd_sock_c,line.c_str(),line.size(),0);
-        cout<<"sent data "<<endl;
+        send(fd_sock_c,"\n",1,0);
     }
     send(fd_sock_c,"\n\r",2,0);
+ 
     f.close();
 }
+
+
+
+void upload(int fd_sock, char * dir,char *file){
+    string dirS = dir;
+    string fileS = file;
+    string path = dirS + "/" + fileS;
+    
+    char buff2[1024];
+    int lgth;
+    lgth = recv(fd_sock,buff2,1023,0);
+    buff2[lgth] = '\0';
+    
+    if(strncmp(buff2,"1\n\n",lgth) == 0){
+        return;
+    }
+
+    ofstream f(path.c_str());
+    if (!f.is_open()) {
+        std::cerr << "Error opening file: " << path << std::endl;
+        return;
+    }
+
+    while(doIt){
+        f<<buff2;
+        if(strncmp((buff2+(lgth-2)),"\n\r",2) == 0){
+            doIt = false;
+        }
+        else{
+            memset(buff2,0,1024);
+            lgth = recv(fd_sock,buff2,1023,0);
+        }
+    }
+
+    f.close();
+}
+
+
+
 
 int main(int argc, char ** argv){
     set_handler();
@@ -159,26 +192,24 @@ int main(int argc, char ** argv){
                 perror("accept");
                 exit(EXIT_FAILURE);
             }
+            cout<< "here I exited"<<endl;
             exit(EXIT_SUCCESS); 
         }
         while(compute){
             lgth = recv(fd_sock_c,buff,PACKET_SIZE-1,0);
             buff[lgth] = '\0';
-            cout << buff <<endl;
-            cout << " lgth = "<<lgth<< endl;
+            /*cout << buff <<endl;
+            cout << " lgth = "<<lgth<< endl;*/
             if((strncmp(buff,"LIST",4) == 0) || (strncmp(buff,"list",4) == 0)){
                 list(fd_sock_c,argv[2]);
             }
 
             if((strncmp(buff,"UPLOAD",6) == 0) || (strncmp(buff,"upload",6) == 0)){
-                //upload();
-                
+                upload(fd_sock_c,argv[2],buff+7);
             }
         
             if((strncmp(buff,"DOWNLOAD",8) == 0) || (strncmp(buff,"download",8) == 0)){
-                cout<<"here in download"<<endl;
                 download(fd_sock_c,argv[2],buff+9);                      // client side : download file
-                break;
             }
 
             if((strncmp(buff,"QUIT",4) == 0) || (strncmp(buff,"quit",4) == 0)){

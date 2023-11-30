@@ -65,7 +65,7 @@ void download(int fd_sock,char *file){
     lgth = recv(fd_sock,buff2,1023,0);
     buff2[lgth] = '\0';
     if(strncmp(buff2,"1\n\n",lgth) == 0){
-        cout << "The file : "<<file<<" doesn't exist"<<endl;
+        cout << "The file : "<<buff<<" doesn't exist"<<endl;
         return;
     }
     ofstream  f(file);
@@ -88,45 +88,6 @@ void download(int fd_sock,char *file){
     f.close();
 
 }
-
-void upload (int fd_sock, char *file){
-
-    DIR * di = opendir(".");
-    struct dirent *entry;
-    int d = 0;
-    while((entry = readdir(di))){
-        if(strcmp(entry->d_name,".") == 0) continue;
-        if(strcmp(entry->d_name,"..") == 0) continue;
-        if(strncmp(entry->d_name,file,entry->d_namlen) != 0) continue;
-        d++;
-        break ;
-    } 
-    
-    if(d == 0){
-        send(fd_sock,"1\n\n",1,0);                //the client will handle the error : the file doesn't exist
-        cout<< "error : filename doesn't exist"<<endl;
-        return;
-    }
-   
-    
-    string fileS = file;
-    string path = "./" + fileS;
-    ifstream f(path.c_str());
-
-    if (!f.is_open()) {
-        std::cerr << "Error opening file: " << path << std::endl;
-        return;
-    }
-
-    string line ;
-    while(getline(f,line)){
-        send(fd_sock,line.c_str(),line.size(),0);
-        send(fd_sock,"\n",1,0);
-    }
-    send(fd_sock,"\n\r",2,0);
-    f.close();
-}
-
 
 int main(int argc, char **argv){   //exec SERVERIP PORTIP
     bool doIt = true;
@@ -171,12 +132,12 @@ int main(int argc, char **argv){   //exec SERVERIP PORTIP
             free(buff);
         }
 
-        if((strncmp(buff,"UPLOAD",6) == 0) || (strncmp(buff,"upload",6) == 0)){
-            upload(fd_sock,buff+7);
+        /*if((strncmp(buff,"UPLOAD",6) == 0) || (strncmp(buff,"upload",6) == 0)){
+            upload(fd_sock);
             free(buff);
             
         }
-        
+        */
         //add feature to specify the directory to store the file to download
         if((strncmp(buff,"DOWNLOAD",8) == 0) || (strncmp(buff,"download",8) == 0)){
             download(fd_sock,buff+9);   
@@ -193,3 +154,5 @@ int main(int argc, char **argv){   //exec SERVERIP PORTIP
 
     return 0;
 }
+
+
