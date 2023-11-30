@@ -90,15 +90,16 @@ void download(int fd_sock_c,char *dir,char *file){
 
 
 void upload(int fd_sock, char * dir,char *file){
+    
     string dirS = dir;
     string fileS = file;
     string path = dirS + "/" + fileS;
-    
+    bool doIt2 = true;
     char buff2[1024];
     int lgth;
     lgth = recv(fd_sock,buff2,1023,0);
     buff2[lgth] = '\0';
-    
+
     if(strncmp(buff2,"1\n\n",lgth) == 0){
         return;
     }
@@ -109,17 +110,17 @@ void upload(int fd_sock, char * dir,char *file){
         return;
     }
 
-    while(doIt){
+    while(doIt2){
         f<<buff2;
         if(strncmp((buff2+(lgth-2)),"\n\r",2) == 0){
-            doIt = false;
+            doIt2 = false;
         }
         else{
             memset(buff2,0,1024);
             lgth = recv(fd_sock,buff2,1023,0);
         }
     }
-
+    
     f.close();
 }
 
@@ -183,7 +184,9 @@ int main(int argc, char ** argv){
         exit(EXIT_FAILURE);
     }
     while(doIt){
+       
         //Bloquant
+        cout<<"Waiting for connexion"<<endl;
         compute = true;
         if((fd_sock_c = accept(fd_sock,(struct sockaddr*) &addr_client,&addr_len_client)) < 0){
             shutdown(fd_sock,2);
@@ -192,7 +195,6 @@ int main(int argc, char ** argv){
                 perror("accept");
                 exit(EXIT_FAILURE);
             }
-            cout<< "here I exited"<<endl;
             exit(EXIT_SUCCESS); 
         }
         while(compute){
@@ -216,10 +218,14 @@ int main(int argc, char ** argv){
                 cout <<"shutting down the client connexion"<<endl;
                 compute = false;
                 shutdown(fd_sock_c,2);
-                close(fd_sock_c);
+                close(fd_sock_c);       
             }
         }
     }
+
+    
+    shutdown(fd_sock,2);
+    close(fd_sock);
     return 0;
 
 }
