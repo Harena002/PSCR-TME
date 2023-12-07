@@ -40,6 +40,7 @@ void list(int fd_sock_c, char *dir){   //exec portnumber directory
     while((entry = readdir(d))){
         if(strcmp(entry->d_name,".") == 0) continue;
         if(strcmp(entry->d_name,"..") == 0) continue;
+        if(entry->d_type != DT_REG) continue;
         send(fd_sock_c,"\n",1,0);
         send(fd_sock_c,entry->d_name,strlen(entry->d_name),0);
     }
