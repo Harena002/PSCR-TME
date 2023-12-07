@@ -40,6 +40,7 @@ void list(int fd_sock_c, char *dir){   //exec portnumber directory
     while((entry = readdir(d))){
         if(strcmp(entry->d_name,".") == 0) continue;
         if(strcmp(entry->d_name,"..") == 0) continue;
+        if(entry->d_type != DT_REG) continue;
         send(fd_sock_c,"\n",1,0);
         send(fd_sock_c,entry->d_name,entry->d_namlen,0);
     }
@@ -49,7 +50,6 @@ void list(int fd_sock_c, char *dir){   //exec portnumber directory
 
 
 void download(int fd_sock_c,char *dir,char *file){
-    //cout <<"dir = "<<dir<<" file : "<<file<<endl;
     DIR * di = opendir(dir);
     struct dirent *entry;
     int d = 0;
@@ -200,8 +200,6 @@ int main(int argc, char ** argv){
         while(compute){
             lgth = recv(fd_sock_c,buff,PACKET_SIZE-1,0);
             buff[lgth] = '\0';
-            /*cout << buff <<endl;
-            cout << " lgth = "<<lgth<< endl;*/
             if((strncmp(buff,"LIST",4) == 0) || (strncmp(buff,"list",4) == 0)){
                 list(fd_sock_c,argv[2]);
             }
