@@ -4,6 +4,23 @@
 #include <netinet/ip.h>
 #include <string>
 #include <iosfwd>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <sys/dir.h>
+#include <dirent.h>
+#include <signal.h>
+#include <sys/errno.h>
+#include <string>
 
 namespace pr {
 

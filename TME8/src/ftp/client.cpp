@@ -26,9 +26,9 @@ void list(int fd_sock){
     bool doIt = true;
     char buff[PACKET_SIZE];
     int lgt = recv(fd_sock,buff,PACKET_SIZE-1,0);
-    //cout<< "lgth : "<<lgt<<endl;
+  
     while(doIt){
-        //cout<<"length of buff : "<<strlen(buff)<<endl;
+        
         buff[lgt] = '\0';
         cout<<buff<<endl;
         
@@ -145,7 +145,7 @@ int main(int argc, char **argv){   //exec SERVERIP PORTIP
     }
 
         
-    if (inet_pton(AF_INET, argv[1], &dest.sin_addr)<= 0) {
+    if (inet_pton(AF_INET, argv[1], &dest.sin_addr)<= 0) {  //don't forget this . convert the a.b.c.d adress from the terminal to an IP adress exploitable
         perror( "Invalid address/ Address not supported ");
         exit(EXIT_FAILURE);
     }
@@ -171,23 +171,26 @@ int main(int argc, char **argv){   //exec SERVERIP PORTIP
             free(buff);
         }
 
-        if((strncmp(buff,"UPLOAD",6) == 0) || (strncmp(buff,"upload",6) == 0)){
+        else if((strncmp(buff,"UPLOAD",6) == 0) || (strncmp(buff,"upload",6) == 0)){
             upload(fd_sock,buff+7);
             free(buff);
             
         }
         
-        //add feature to specify the directory to store the file to download
-        if((strncmp(buff,"DOWNLOAD",8) == 0) || (strncmp(buff,"download",8) == 0)){
+        
+        else if((strncmp(buff,"DOWNLOAD",8) == 0) || (strncmp(buff,"download",8) == 0)){
             download(fd_sock,buff+9);   
             free(buff);
             
         }
-         if((strncmp(buff,"QUIT",4) == 0) || (strncmp(buff,"quit",4) == 0)){
+        else if((strncmp(buff,"QUIT",4) == 0) || (strncmp(buff,"quit",4) == 0)){
             doIt = false;
             free(buff);
             shutdown(fd_sock,2);
             close(fd_sock);
+        }
+        else {
+            cerr << "Error: command not find"<<endl;
         }
     }
 
